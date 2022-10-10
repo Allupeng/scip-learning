@@ -1,0 +1,32 @@
+(define (new-if predicate consequent alternative)
+    (cond (predicate consequent)
+        (else alternative)))
+
+(define (sqrt-iter guess x) 
+   (new-if (good-enough? guess x) 
+          guess 
+          (sqrt-iter (improve guess x) x)))
+
+(define (improve guess x)
+    (average guess (/ x guess)))
+
+(define (average x y)
+    (/ (+ x y) 2))
+
+(define (good-enough? guess x)
+    (< (abs(- (square guess) x)) 0.001))
+
+(define (square x)
+    (* x x))
+
+(define (f x)
+    (sqrt-iter 1.0 x))
+
+(trace sqrt-iter)
+
+(f 3)
+
+(if #t (display "true") (display "false"))
+
+(new-if #t (display "true") (display "false"))
+
