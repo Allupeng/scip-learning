@@ -48,6 +48,8 @@ $$
 
 ## 1.2.2 树形递归
 
+### 斐波那契数列
+
 斐波那契数列的定义为
 $$
 F(n) =
@@ -58,7 +60,7 @@ F(n-1) + F(n-2) & else
 \end{cases}
 $$
 
-### 递归
+#### 递归
 我们很容易的可以通过该定义写出一个递归`procedure`
 ```scheme
 (define (fib-recur n)
@@ -68,7 +70,7 @@ $$
 ```
 但是**递归模型**下对于一些值进行了重复计算
 
-### 迭代
+#### 迭代
 对于斐波那契数列的定义，我们可以参考阶乘计算的定义。计算`Fib(n)`首先是`Fib(0) + Fib(1)` 计算出`Fib(2)`，然后通过`Fib(1) + Fib(2)`计算出`Fib(3)`，以此类推，直至计算到`Fib(n)`
 所以定义两个数a、b，将a = Fib(1) b = Fib(0)
 `a <- a + b`
@@ -81,4 +83,41 @@ $$
     (if (= counter max)
         b
         (fib-iter (+ a b) a (+ counter 1) max)))
+```
+
+### 换零钱
+
+将总数为`a`的现金换成`n`种硬币的不同方法的数目
+
+*   将现金`a`换成除了第一种硬币以外的所有其他硬币的不同方式数目,加上
+*   将现金`a - d`换成所有种类硬币的不同方式数目,其中`d`为第一种硬币的面值
+
+这样可以将问题简化为更少**现金数**或更少**硬币数**的问题.
+
+这样我们针对`a`和`n`确定算法
+1. `if a = 0` 兑换硬币的方法为1种
+2. `if a < 0` 兑换硬币的方法为0种
+3. `if n = 0` 兑换硬币的方式为0种
+
+递归代码如下
+```scheme
+(define (coin-iter amount kinds-of-coin)
+    (cond ((= amount 0) 1)
+        ((< amount 0) 0)
+        ((= kinds-of-coin 0) 0)
+        (else (+ 
+            (coin-iter amount (- kinds-of-coin 1)) 
+            (coin-iter (- amount (coin-demonination kinds-of-coin)) kinds-of-coin)))))
+
+(define (coin amount)
+    (coin-iter amount 5))
+
+(define (coin-demonination order)
+    (cond ((= order 1) 1)
+          ((= order 2) 5)
+          ((= order 3) 10)
+          ((= order 4) 25)
+          ((= order 5) 50)))
+
+(coin 100)
 ```

@@ -1,0 +1,87 @@
+# 1.2.2’s exercises
+
+## exercise 1.11
+
+A function *f* is defined by the rule that
+$$
+f(n) = 
+\begin {cases}
+n & if & {n < 3},\\
+f(n-1)+2f(n-2)+3f(n-3) & if & {n \geq 3}
+\end {cases}
+$$
+Write a procedure that computes *f*  by means of a recursive process. Write a procedure that computes *f* by means of an iterative process.
+
+### solution
+
+#### recur
+
+```scheme
+(define (f n)
+    (if (< n 3)
+        n
+        (+ (f (- n 1)) 
+        (* 2 (f (- n 2))) 
+        (* 3 (f (- n 3))))))
+
+(f 1)
+
+(f 2)
+
+(f 3)
+```
+
+
+
+#### iterative
+定义三个数 `pre cur last`
+`pre = 0 cur = 1 last = 2`
+我们可以向一下当 `n = 3` 时, 计算方式如下
+`f(3) = last + 2*cur + 3*pre`
+所以我们可以模拟
+`last <- last + 2*cur + 3*pre`
+`pre <- cur`
+`cur <- last`
+实现代码如下
+```scheme
+(define (f n)
+    (if (< n 3)
+        n
+        (f-iter 0 1 2 (- n 2))))
+
+(define (f-iter pre cur last count)
+    (if (= count 0)
+        last
+        (f-iter cur last (+ last (* 2 cur) (* 3 pre)) (- count 1))))
+
+(f 5)
+```
+
+## exercise 1.12
+
+The following pattern of numbers is called **Pascal’s triangle**. The numbers at the edge of the triangle are all 1, and each number inside the triangle is the sum of the two numbers above it. Write a procedure that computes elements of Pascal’s triangle by means of a recursive process.
+
+### solution
+
+首先尝试定义**Pascal triangle**
+$$
+f(row,col) = 
+\begin{cases}
+1 & row = col or col = 1 \\ 
+f(row - 1,col) + f(row - 1,col - 1) & others
+\end{cases}
+$$
+
+根据定义写代码
+```scheme
+(define (f row col)
+    (if (or (= row col) (= col 1))
+        1
+        (+ (f (- row 1) col) (f (- row 1) (- col 1)))))
+
+(f 13 4)
+```
+
+## exercise 1.13
+
+注重于数学证明。略过
