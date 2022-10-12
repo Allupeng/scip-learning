@@ -65,12 +65,14 @@ $$
 
 #### 递归
 我们很容易的可以通过该定义写出一个递归`procedure`
+
 ```scheme
 (define (fib-recur n)
     (cond ((= n 0) 0)
         ((= n 1) 1)
         (else (+ (fib-recur (- n 1)) (fib-recur (- n 2))))))
 ```
+
 但是**递归模型**下对于一些值进行了重复计算
 
 #### 迭代
@@ -78,6 +80,7 @@ $$
 所以定义两个数a、b，将a = Fib(1) b = Fib(0)
 `a <- a + b`
 `b <- a`
+
 ```scheme
 (define (fib n)
     (fib-iter 1 0 0 n))
@@ -103,6 +106,7 @@ $$
 3. `if n = 0` 兑换硬币的方式为0种
 
 递归代码如下
+
 ```scheme
 (define (coin-iter amount kinds-of-coin)
     (cond ((= amount 0) 1)
@@ -143,6 +147,7 @@ $$b^0 = 1$$
 
 ### 递归 recursive
 根据定义可以很容易的写出递归代码
+
 ```scheme
 (define (expt b n)
     (cond ((= n 0) 1)
@@ -151,9 +156,48 @@ $$b^0 = 1$$
 ```
 
 ### 线性迭代 iterative
-可以根据两个定义来写线性迭代的代码
 
-$$b^0 = 1$$
+$b^n$其实就是$b$的$n$次乘法  
+迭代代码如下
 
-$$b^1 = b$$
+```scheme
+(define (expt b n)
+    (expt-iter b n 1))
 
+(define (expt-iter b n cur)
+    (if (= n 0)
+    cur
+    (expt-iter b (- n 1) (* cur b))))
+```
+### 优化
+对于偶数来说
+
+$$ b^2 = b \times b$$
+
+$$ b^4 = b^2 \times b^2$$
+
+$$ b^8 = b^4 \times b^4$$
+
+归纳以上公式而言
+
+$$
+    b(n) = 
+    \begin{cases}
+    (b^{\frac{n}{2}})^2, & \text{n = 偶数} \newline
+    b^{n-1} \times b , & \text{n = 奇数} \newline
+    \end{cases}
+$$
+
+代码如下  
+```scheme
+(define (square x)
+    (* x x))
+
+(define (is-even n)
+    (= (remainder n 2) 0))
+
+((define (expt b n)
+    (cond ((= n 0) 1)
+        ((is-even n) (square (expt b (/ n 2))))
+        (else (* (expt b (- n 1)) (expt b 1))))))
+```
