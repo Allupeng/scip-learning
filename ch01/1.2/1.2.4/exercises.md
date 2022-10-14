@@ -42,4 +42,67 @@ Design a procedure that evolves an iterative exponentiation process that uses su
 
 ### solution
 
-$a \times b$
+$a \times b=(a+a+...+a)$这里根据奇偶数可以
+
+$$
+f(a) = 
+\begin{cases}
+    2\times(a\times\frac{b}{2}) & \text{, b为偶数}\newline
+    a +(b-1)*a & \text{, b为奇数}\newline
+\end{cases}
+$$ 
+
+```scheme
+(define (double x)
+    (+ x x))
+
+(define (havlf x)
+    (/ x 2))
+
+(define (even? x)
+    (= (remainder x 2) 0))
+
+(define (times a b)
+    (cond ((= b 0) 0)
+        ((even? b) (times (double a) (havlf b)))
+        (else (+ a (times a (- b 1))))))
+```
+
+而该运算结果是基于递归过程的
+
+## 1.18 exercise
+Using the results of **Exercise 1.16** and **Exercise 1.17**, devise a procedure that generates an iterative process for multiplying two integers in terms of adding, doubling, and halving and uses a logarithmic number of steps.
+
+### solution
+**exercise 1.17**是基于递归过程的时间复杂度为对数的计算过程。  
+现在需设计一个基于iterative的计算过程来计算两数乘积。  
+首先定义一个变量`cur = 0`，`cur <- a + cur`这个运行`b`次
+
+```scheme
+(define (double x)
+    (+ x x))
+
+(define (havlf x)
+    (/ x 2))
+
+(define (even? x)
+    (= (remainder x 2) 0))
+
+(define (odd? x)
+    (= (remainder x 2) 1))
+
+(define (multi a b)
+    (multi-iter a b 0))
+
+(define (multi-iter a b cur)
+    (cond ((= b 0) 
+            cur)
+        ((even? b) 
+            (multi-iter (double a)
+                        (havlf b)
+                        cur))
+        ((odd? b) 
+            (multi-iter a 
+                        (- b 1) 
+                    (+ a cur)))))
+```
