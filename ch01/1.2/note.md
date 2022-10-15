@@ -201,3 +201,11 @@ $$
         ((is-even n) (square (expt b (/ n 2))))
         (else (* (expt b (- n 1)) (expt b 1))))))
 ```
+
+## 1.2.5最大公约数
+
+欧几里得算法：如果r是a除以b的余数，那么a和b的公约数正好也是b和r的公约数
+
+$$
+GCD(a,b) = GCD(b,r)
+$$
