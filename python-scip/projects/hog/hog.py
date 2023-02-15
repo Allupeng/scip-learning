@@ -2,7 +2,7 @@
 
 from dice import six_sided, make_test_dice
 from ucb import main, trace, interact
-from math import log2
+from math import log2, sqrt
 
 GOAL = 100  # The goal of Hog is to score 100 points.
 
@@ -83,6 +83,7 @@ def square_update(num_rolls, player_score, opponent_score, dice=six_sided):
     """Return the total score of a player who starts their turn with
     PLAYER_SCORE and then rolls NUM_ROLLS DICE, *including* Square Swine.
     """
+
     score = player_score + take_turn(num_rolls, opponent_score, dice)
     if perfect_square(score):  # Implement perfect_square
         return next_perfect_square(score)  # Implement next_perfect_square
@@ -91,7 +92,12 @@ def square_update(num_rolls, player_score, opponent_score, dice=six_sided):
 
 
 # BEGIN PROBLEM 4
-"*** YOUR CODE HERE ***"
+def perfect_square(score):
+    root = int(sqrt(score))
+    return root * root == score
+
+def next_perfect_square(score):
+    return (int(sqrt(score)) + 1) ** 2
 # END PROBLEM 4
 
 
@@ -128,11 +134,17 @@ def play(strategy0, strategy1, update,
     dice:      A function of zero arguments that simulates a dice roll.
     goal:      The game ends and someone wins when this score is reached.
     """
-    who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
-    "*** YOUR CODE HERE ***"
-    # END PROBLEM 5
+    who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
+    while score0 < goal and score1 < goal:
+        if who == 0:
+            score0 = update(strategy0(score0, score1), score0, score1, dice)
+        else:
+            score1 = update(strategy1(score1, score0), score1, score0, dice)
+        who = 1 - who
     return score0, score1
+    # END PROBLEM 5
+
 
 
 #######################
@@ -155,7 +167,9 @@ def always_roll(n):
     """
     assert n >= 0 and n <= 10
     # BEGIN PROBLEM 6
-    "*** YOUR CODE HERE ***"
+    def strategy(cur_score, opponent_score):
+        return n
+    return strategy
     # END PROBLEM 6
 
 
@@ -185,7 +199,12 @@ def is_always_roll(strategy, goal=GOAL):
     False
     """
     # BEGIN PROBLEM 7
-    "*** YOUR CODE HERE ***"
+    for cur_score in range(0, 100):
+        for opponent_score in range(0, 99):
+            if strategy(cur_score, opponent_score) != strategy(cur_score, opponent_score + 1):
+                return False
+    return True
+
     # END PROBLEM 7
 
 
@@ -201,7 +220,15 @@ def make_averaged(original_function, total_samples=1000):
     3.0
     """
     # BEGIN PROBLEM 8
-    "*** YOUR CODE HERE ***"
+    def solve_core(*args):
+        result = 0
+        i = 0
+        while i < total_samples:
+            result += original_function(*args)
+            i += 1
+        return result / total_samples
+    return solve_core
+
     # END PROBLEM 8
 
 
@@ -215,7 +242,15 @@ def max_scoring_num_rolls(dice=six_sided, total_samples=1000):
     1
     """
     # BEGIN PROBLEM 9
-    "*** YOUR CODE HERE ***"
+    highest_avg_score = 0
+    max_avg_score_rolls = 0
+    for rolls in range(1,11):
+        avg_score = make_averaged(roll_dice, total_samples)(rolls, dice)
+        if avg_score > highest_avg_score:
+            highest_avg_score = avg_score
+            max_avg_score_rolls = rolls
+        rolls += 1
+    return max_avg_score_rolls
     # END PROBLEM 9
 
 
@@ -259,14 +294,23 @@ def tail_strategy(score, opponent_score, threshold=12, num_rolls=6):
     points, and returns NUM_ROLLS otherwise. Ignore score and Square Swine.
     """
     # BEGIN PROBLEM 10
-    return num_rolls  # Remove this line once implemented.
+    points = tail_points(opponent_score)
+    if points >= threshold:
+        return 0
+    else:
+        return num_rolls
     # END PROBLEM 10
 
 
 def square_strategy(score, opponent_score, threshold=12, num_rolls=6):
     """This strategy returns 0 dice when your score would increase by at least threshold."""
     # BEGIN PROBLEM 11
-    return num_rolls  # Remove this line once implemented.
+    incre = tail_points(opponent_score)
+    if incre > threshold:
+        return 0
+    if perfect_square(score + incre) and ((next_perfect_square(score + incre) - score) > threshold):
+        return 0
+    return num_rolls
     # END PROBLEM 11
 
 
